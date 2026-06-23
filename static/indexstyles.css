@@ -1,0 +1,329 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #222;
+    background-color: #f5f7fb;
+    padding: 0;
+    margin: 0;
+}
+
+h1, h3 {
+    color: #41a692;
+    margin-bottom: 10px;
+}
+
+hr {
+    border: 0;
+    border-top: 2px solid #0e0000;
+    width: 80%;
+    margin-bottom: 20px;
+}
+
+/* Form Elements */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select,
+textarea {
+    padding: 10px;
+    border: 3px solid #792fc3;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* Buttons */
+input[type="submit"],
+button {
+    border-radius: 17px;
+    background: linear-gradient(145deg, #f0f0f0, #cacaca);
+    box-shadow:  7px 7px 8px #8f8f8f,
+             -7px -7px 8px #ffffff;
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background: linear-gradient(145deg, #f0f0f0, #cacaca);
+    padding: 10px 20px;
+    box-shadow:   rgba(50, 70, 93, .5) 0px 30px 50px .1px inset, rgba(0, 0, 0, 1) 0px 18px 26px -18px inset;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+/* Links */
+a {
+    color: #007bff;
+    text-decoration: wavy;
+    font-weight: 900;
+    padding: 5px 10px;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+    padding: 5px 10px;
+}
+
+/* Data Tables */
+table {
+    border-radius: 50px;
+    background: #312b82;
+    box-shadow:   rgba(50, 70, 93, .5) 0px 30px 50px .1px inset, rgba(0, 0, 0, 1) 0px 18px 26px -18px inset;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    table-layout: auto;
+    color: #ffffff;
+}
+
+th {
+    background-color: transparent;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+}
+
+th, td {
+    border-bottom: 1px solid #4e45d0;
+    padding: 10px 14px;
+    vertical-align: middle;
+}
+
+/* Make table more compact and readable inside UI cluster */
+.ui-cluster table {
+    /* Allow the custom box-shadow to show */
+}
+
+.ui-cluster table td {
+    text-align: left;
+}
+
+.ui-cluster table th,
+.ui-cluster table td {
+    background-color: transparent;
+    text-align: left;
+}
+
+.ui-cluster table th:first-child,
+.ui-cluster table td:first-child {
+    text-align: center;
+    width: 6rem;
+}
+
+/* Tighter controls inside tables */
+.ui-cluster table select,
+.ui-cluster table input[type="text"],
+.ui-cluster table input[type="password"] {
+    border: 1px solid #cfcfd3;
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+
+.ui-cluster table input[type="submit"],
+.ui-cluster table button {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.ui-cluster table .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* UI cluster card for simple beginner-friendly layout */
+.ui-cluster {
+    --bg: #e8e8e8;
+    --contrast: #e2e0e0;
+    --grey: #93a1a1;
+    position: relative;
+    padding: 27px; /* 9px for card border + 18px inner padding */
+    background-color: var(--bg);
+    border-radius: 35px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+    margin: 24px auto;
+    width: 87%;
+    max-width: 1100px;
+    z-index: 1; /* Creates stacking context for pseudo-elements */
+}
+
+.ui-cluster::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-conic-gradient(var(--bg) 0.0000001%, var(--grey) 0.000104%) 60% 60%/600% 600%;
+    filter: opacity(10%) contrast(105%);
+    border-radius: 35px;
+    z-index: -2;
+}
+
+.ui-cluster::after {
+    content: "";
+    position: absolute;
+    inset: 9px;
+    pointer-events: none;
+    background-color: var(--contrast);
+    border-radius: 30px;
+    z-index: -1;
+}
+
+.ui-cluster.center {
+    color: darkslategray;
+    text-align: center;
+}
+
+/* Fixed background element for consistent background on mobile/desktop */
+.bg-fixed {
+    position: fixed;
+    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    background-image: url('https://www.janestreet.com/assets/offices-header-nyc-6036243e3a92b9e0cdb6f58bd6d74562007762cb281af148f77e946a51c19a54.png');
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+
+/* Ensure content is above background */
+.ui-cluster {
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-background {
+    background-image: url("https://img.magnific.com/free-photo/spacious-brick-wall-office-with-nobody_482257-119330.jpg?semt=ais_hybrid&w=740&q=80");
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+}
+
+/* Specific Action Buttons */
+.ui-cluster table button.btn-update {
+    border-radius: 17px;
+    background: linear-gradient(145deg, #2a50af, #6068f0);
+    box-shadow:  3px 3px 3px #000000,
+                 -3px -3px 3px #000000; 
+}
+
+.ui-cluster table button.btn-delete {
+    border-radius: 17px;
+    background: linear-gradient(145deg, #c64040, #f00f0f);
+    box-shadow:  3px 3px 3px #000000,
+                 -3px -3px 3px #000000; 
+    
+}
+/* From Uiverse.io by Praashoo7 */ 
+/* The switch - the box around the slider */
+.switch {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  box-shadow: inset 2px 5px 10px rgba(0,0,0,0.3);
+  transition: .4s;
+  border-radius: 5px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 0.1em;
+  border-radius: 0px;
+  left: 0.3em;
+  bottom: 0.3em;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #171717;
+  box-shadow: inset 2px 5px 10px rgb(0, 0, 0);
+}
+
+input:checked + .slider:before {
+  transform: translateX(2.8em) rotate(360deg);
+}
+#theme-switch{
+    height: 35px;
+    width: 75px;
+    display: flex;
+    top: 20px;
+    right: 20px;
+}
+body.darkmode {
+    background-color: #070707;
+    color: #000000;
+}
+
+body.darkmode .ui-cluster {
+    --bg: #000000;
+    --contrast: #000000;
+    --grey: #000000;
+}
+
+body.darkmode h1, 
+body.darkmode h3 {
+    color: #64ffda;
+}
+
+/* Styled file upload button */
+.file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(145deg, #f0f0f0, #cacaca);
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #222;
+    box-shadow: 3px 3px 6px rgba(0,0,0,0.12), -3px -3px 6px rgba(255,255,255,0.6);
+}
+.file-btn input[type="file"] {
+    display: none;
+}
+.file-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* small filename text next to button */
+#file-name {
+    max-width: 18rem;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='ticket.png') }}"
+>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='indexstyles.css')}}">
+</head>
+
+<body>
+    <div class="bg-fixed"></div>
+    <div class="ui-cluster center">
+        <h1 style="text-align: center;">User Login</h1>
+        <hr>
+        <br>
+        <a href="/">Home</a>
+        <h3 style="text-align: center;">{{ text }}</h3>
+        
+        <form id="loginForm">
+            <input type="text" name="email" id="email" placeholder="Email" required>
+            <br>
+            <br>
+            <input type="password" name="password" id="password" placeholder="Password" required>
+            <br>
+            <br>
+            <input type="submit" value="Login" id="loginBtn">
+            <br>
+            <br>
+            <p>Don't have an account? <a href="/register">Register</a></p>
+        </form>
+        
+        <div id="googleLoginContainer">
+            <br>
+            <br>
+            <button type="button" id="googleBtn" style="width: 100%; padding: 10px; cursor: pointer;">Login With Google</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2F_s0thIVRgPEoSrbq-C3Rj1MVPQrYks",
+            authDomain: "ticket-management-system-1233e.firebaseapp.com",
+            projectId: "ticket-management-system-1233e",
+            storageBucket: "ticket-management-system-1233e.firebasestorage.app",
+            messagingSenderId: "934840929111",
+            appId: "1:934840929111:web:0659e0babd61764f8fcc12"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        console.log("Firebase Engine Online!");
+
+        // --- EMAIL/PASSWORD FORM LISTENER ---
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                console.log("Attempting Firebase auth for:", email);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const token = await userCredential.user.getIdToken(true); 
+                
+                console.log("Frontend verified token payload generated:", token ? "TOKEN_EXISTS" : "TOKEN_BLANK");
+
+                if (!token) {
+                    alert("Frontend Error: Firebase failed to generate a valid token string.");
+                    return;
+                }
+
+                const response = await fetch("/verify-token", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ token: token })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = "/dashboard";
+                } else {
+                    alert(data.error);
+                }
+
+            } catch(error) {
+                console.error("Login failure trace:", error);
+                alert(error.message);
+            }
+        });
+
+        // --- FIXED: GOOGLE LOGIN ISOLATED BUTTON CLICK LISTENER ---
+        document.getElementById("googleBtn").addEventListener("click", async () => {
+            console.log("Google authentication button clicked explicitly.");
+            
+            try {
+                const provider = new GoogleAuthProvider();
+                
+                // Open the Google pop-up container context without structural window resets
+                const userCredential = await signInWithPopup(auth, provider);
+                const token = await userCredential.user.getIdToken(true);
+                
+                console.log("Google token generated:", token ? "TOKEN_EXISTS" : "TOKEN_BLANK");
+
+                if (!token) {
+                    alert("Frontend Error: Google Auth failed to return a token string.");
+                    return;
+                }
+
+                const response = await fetch("/verify-token", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ token: token })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log("Handshake complete! Moving to dashboard page context.");
+                    window.location.href = "/dashboard";
+                } else {
+                    // This outputs the exact database error string from your Python server
+                    alert("Backend Error: " + data.error);
+                }
+
+            } catch(error) {
+                console.error("Google Auth error trace:", error);
+                alert("Google Popup Error: " + error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

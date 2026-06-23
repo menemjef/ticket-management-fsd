@@ -1,0 +1,6 @@
+Flask
+firebase-admin
+mysql-connector-python
+requests
+gunicorn
+werkzeug

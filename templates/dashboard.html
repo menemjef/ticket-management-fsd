@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='ticket.png') }}"
+>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <h1 style="text-align: center;">Welcome to the Dashboard, {{ username }}!</h1>
+    <hr>
+    <a href="/">Home</a>
+    <link rel="stylesheet" href="{{url_for('static', filename='indexstyles.css')}}">
+</head>
+<body>
+    <div class="bg-fixed"></div>
+    <div class="ui-cluster center">
+    <h2 style="color: rgb(29, 48, 85); text-align: center;">Actions:</h2>
+
+    <form action="/create-ticket-page" method="get" style="text-align: center;">
+        <br>
+        <button type="submit">Create Ticket</button>
+        <h3 style="text-align: center;">{{ttext}}</h3>
+    </form>
+
+    <form action="/view-tickets" method="get" style="text-align: center; margin-top: 1rem;">
+        <br>
+        <button type="submit">View Tickets</button>
+        <h3 style="text-align: center;">{{yttext}}</h3>
+    </form>
+
+    {% if tickets %}
+    <table style="margin:auto; border-collapse: collapse; margin-top: 1rem;">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Status</th>
+        </tr>
+
+        {% for ticket in tickets %}
+            <tr id="user-ticket-row-{{ ticket.id }}">
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.description }}</td>
+                
+                <td id="user-status-text-{{ ticket.id }}" class="live-status-cell" data-ticket-id="{{ ticket.id }}">
+                    {{ ticket.status }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    
+    <br>
+    <form action="/logout" method="post" style="text-align: center;">
+        <button type="submit">Logout</button>
+    </form>
+    </div>
+
+    <script>
+        // Polls /api/tickets every 5 seconds and updates status cells live without page reload
+        function pollTickets() {
+            fetch('/api/tickets')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) return;
+
+                data.tickets.forEach(ticket => {
+                    const statusCell = document.getElementById(`user-status-text-${ticket.id}`);
+                    const row = document.getElementById(`user-ticket-row-${ticket.id}`);
+
+                    if (!statusCell || !row) return;
+
+                    const currentStatus = statusCell.innerText.trim();
+
+                    if (ticket.status !== currentStatus) {
+                        statusCell.innerText = ticket.status;
+                        // Flash yellow to signal a live update
+                        statusCell.style.backgroundColor = '#ffffcc';
+                        setTimeout(() => statusCell.style.backgroundColor = 'transparent', 2000);
+                    }
+                });
+            })
+            .catch(err => console.error("Error checking live ticket status updates:", err));
+        }
+
+        // Only start polling if there are tickets on screen
+        if (document.querySelectorAll('.live-status-cell').length > 0) {
+            setInterval(pollTickets, 5000);
+        }
+    </script>
+</body>
+</html>

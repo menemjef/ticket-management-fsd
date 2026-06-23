@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='ticket.png') }}"
+>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='indexstyles.css')}}">
+</head>
+
+<body>
+    <div class="bg-fixed"></div>
+    <div class="ui-cluster center">
+    <h1 style="text-align: center;">Register</h1>
+    <hr>
+    <br>
+    <a href="/">Home</a>
+    <form action= "/register" method="post" id="registerForm">
+        <input type="text" name="username" id="username" placeholder="Username" required>
+        <br>
+        <br>
+        <input type="password" name="password" id="password" placeholder="Password" required>
+        <br>
+        <br>
+        <input type="email" name="email" id="email" placeholder="Email" required>
+        <br>
+        <br>
+        <input type="submit" value="Register" id="registerBtn">
+        <p>Already have an account? <a href="/login">Login</a></p>
+    </form>
+    <div id="googleSignupContainer">
+        <br>
+        <br>
+        <button type="button" id="googleSignupBtn" style="width: 100%; padding: 10px; cursor: pointer;">Register With Google</button>
+    </div>
+    </div>
+    <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider }
+from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyB2F_s0thIVRgPEoSrbq-C3Rj1MVPQrYks",
+    authDomain: "ticket-management-system-1233e.firebaseapp.com",
+    projectId: "ticket-management-system-1233e",
+    storageBucket: "ticket-management-system-1233e.firebasestorage.app",
+    messagingSenderId: "934840929111",
+    appId: "1:934840929111:web:0659e0babd61764f8fcc12"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+console.log("Firebase Script loaded successfully!");
+document
+.getElementById("registerForm")
+.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    console.log("Register form submitted!");
+
+    try {
+
+        const username =
+            document.getElementById("username").value;
+
+        const email =
+            document.getElementById("email").value;
+
+        const password =
+            document.getElementById("password").value;
+
+        const userCredential =
+            await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
+        await updateProfile(
+            userCredential.user,
+            {
+                displayName: username
+            }
+        );
+
+        const token =
+            await userCredential.user.getIdToken();
+
+        const response =
+            await fetch(
+                "/register-user",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                        token: token,
+                        username: username
+                    })
+                }
+            );
+
+        const responseText = await response.text();
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            throw new Error("Server returned HTML instead of JSON: " + responseText.substring(0, 150));
+        }
+
+        if(data.success){
+            alert(
+                "Registration Successful"
+            );
+
+            window.location.href =
+                "/login";
+        } else {
+            throw new Error(data.error || "Server error during registration.");
+        }
+
+    }
+    catch(error){
+
+        alert(
+            error.message
+        );
+
+        console.log(error);
+
+    }
+
+});
+document
+.getElementById("googleSignupBtn")
+.addEventListener("click", async (e) => {
+    e.preventDefault();
+    console.log("Google Register button clicked!");
+
+    try {
+        const provider = new GoogleAuthProvider();
+        const userCredential =
+            await signInWithPopup(
+                auth,
+                provider
+            );
+
+        // Try to get their Google Display Name, fallback to the email prefix
+        let username = userCredential.user.displayName;
+        if (!username) {
+            username = userCredential.user.email.split('@')[0];
+        }
+
+        // We don't need updateProfile here because Google usually sets the displayName.
+        // We can just proceed to backend registration.
+
+        const token =
+            await userCredential.user.getIdToken();
+        
+        const response =
+            await fetch(
+                "/register-user",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                        token: token,
+                        username: username
+                    })
+                }
+            );
+
+        const responseText = await response.text();
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            throw new Error("Server returned HTML instead of JSON: " + responseText.substring(0, 150));
+        }
+
+        if(data.success){
+            alert(
+                "Registration Successful"
+            );
+
+            window.location.href =
+                "/login";
+        } else {
+            throw new Error(data.error || "Server error during Google registration.");
+        }
+
+    }
+    catch(error){
+
+        alert(
+            error.message
+        );
+
+        console.log(error);
+
+    }
+
+});
+</script>
+</body>
+
+</html>

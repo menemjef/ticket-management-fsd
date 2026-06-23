@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='ticket.png') }}"
+>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <h1 style="text-align: center;">Welcome to the Admin Dashboard, {{username}}!</h1>
+    <hr>
+    <a href="/" style="text-align: center; display: block;">Home</a>
+    <link rel="stylesheet" href="{{url_for('static', filename='indexstyles.css')}}">
+</head>
+
+<body>
+
+    <div class="bg-fixed"></div>
+    <div class="ui-cluster center">
+        <label class="switch" id = "theme-switch" style="position: absolute; top: 5%; right: 5%;">
+            <input type="checkbox">
+            <span class="slider"></span>
+        </label>
+        <form action="/view-tickets" method="get" style="text-align: center;">
+            <h2 style="text-align: center;">Actions:</h2>
+            <br><br>
+            <input type="submit" value="View All Tickets">
+            <h3 style="text-align: center;">{{ttext}}</h3>
+        </form>
+
+        <form action="/view-ticket-history" method="get" style="text-align: center;">
+            <br><br>
+            <input type="submit" value="View Ticket History">
+            <h3 style="text-align: center;">{{ttext}}</h3>
+        </form>
+        {% if tickets %}
+        <table style="margin:auto; border-collapse: collapse;">
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>User ID</th>
+                <th>Files Uploaded</th>
+                <th>Actions</th>
+            </tr>
+
+            {% for ticket in tickets %}
+            <tr id="ticket-row-{{ ticket.id }}">
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.description }}</td>
+
+                <td id="status-text-{{ ticket.id }}">{{ ticket.status }}</td>
+                <td>{{ ticket.user_id }}</td>
+                <td>
+                    <a href="/download/{{ ticket.id }}" onclick="handleDownload(event, '{{ ticket.id }}')">Download</a>
+                    <div id="download-msg-{{ ticket.id }}" class="download-msg" style="color: red; margin-top: 6px;"></div>
+                </td>
+                <td class="actions">
+                    <select id="select-status-{{ ticket.id }}">
+                        <option value="Open" {% if ticket.status=="Open" %}selected{% endif %}>Open</option>
+                        <option value="In Progress" {% if ticket.status=="In Progress" %}selected{% endif %}>In Progress
+                        </option>
+                        <option value="Closed" {% if ticket.status=="Closed" %}selected{% endif %}>Closed</option>
+                    </select>
+                        
+                    <button type="button" class="btn-update" onclick="updateTicket('{{ ticket.id }}')">Update</button>
+                    <button type="button" class="btn-delete" onclick="deleteTicket('{{ ticket.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if tickethistory %}
+
+        <table style="margin:auto; border-collapse: collapse;">
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>User ID</th>
+            </tr>
+
+            {% for ticket in tickethistory %}
+            <tr id="ticket-row-{{ ticket.id }}">
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.description }}</td>
+
+                <td id="status-text-{{ ticket.id }}">{{ ticket.status }}</td>
+                <td>{{ ticket.user_id }}</td>
+                
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% endif %}
+
+        <br>
+        <form action="/logout" method="post" style="text-align: center;">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
+
+    <script>
+        //0. HANDLES DARK MODE
+        const theme = document.getElementById('theme-switch');
+        const body = document.body;
+        theme.addEventListener('change', () => {
+            body.classList.toggle('darkmode');
+        })
+        // 1. HANDLES LIVE TICKET UPDATES
+        function updateTicket(ticketId) {
+            const chosenStatus = document.getElementById(`select-status-${ticketId}`).value;
+
+            fetch(`/update-ticket/${ticketId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: chosenStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`status-text-${ticketId}`).innerText = data.new_status;
+                    if (data.new_status === "Closed") {
+                        document.getElementById(`ticket-row-${ticketId}`).remove();
+                    } else {
+                        alert("Ticket status updated!");
+                    }
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(err => console.error("Update request failed:", err));
+        }
+
+        // 2. HANDLES LIVE TICKET DELETIONS
+        function deleteTicket(ticketId) {
+            if (!confirm("Are you sure you want to delete this ticket?")) return;
+
+            fetch(`/delete-ticket/${ticketId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`ticket-row-${ticketId}`).remove();
+                    alert("Ticket deleted!");
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(err => console.error("Delete request failed:", err));
+        }
+
+        // 3. HANDLES DOWNLOADS — fetches file and shows message if none found or if redirected to HTML
+        function handleDownload(event, ticketId) {
+            event.preventDefault();
+            const msgEl = document.getElementById(`download-msg-${ticketId}`);
+            msgEl.innerText = '';
+            fetch(`/download/${ticketId}`, { method: 'GET', credentials: 'same-origin' })
+            .then(response => {
+                const ct = (response.headers.get('content-type') || '').toLowerCase();
+
+                // If server returned JSON (message), show it
+                if (ct.includes('application/json')) {
+                    return response.json().then(data => {
+                        msgEl.innerText = data.msg || data.message || 'No attachments found.';
+                    });
+                }
+
+                // If server returned HTML (likely a redirect to login or an error page), do not download it
+                if (ct.includes('text/html') || response.redirected) {
+                    return response.text().then(text => {
+                        try {
+                            const parsed = JSON.parse(text);
+                            msgEl.innerText = parsed.msg || parsed.message || 'No attachments found.';
+                        } catch (e) {
+                            msgEl.innerText = 'No attachments found or session expired.';
+                        }
+                    });
+                }
+
+                // If response not OK, try to surface message
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        try {
+                            const parsed = JSON.parse(text);
+                            msgEl.innerText = parsed.msg || parsed.message || `Download failed (status ${response.status}).`;
+                        } catch (e) {
+                            msgEl.innerText = text || `Download failed (status ${response.status}).`;
+                        }
+                    });
+                }
+
+                // Otherwise treat as file blob and trigger download
+                return response.blob().then(blob => {
+                    const dispo = response.headers.get('content-disposition') || '';
+                    let filename = `ticket-${ticketId}-attachments`;
+                    const match = dispo.match(/filename="?(.+?)"?(;|$)/);
+                    if (match && match[1]) filename = match[1];
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    msgEl.innerText = '';
+                });
+            })
+            .catch(err => {
+                console.error('Download failed:', err);
+                msgEl.innerText = 'Error downloading attachments.';
+            });
+        }
+
+        // 4. REAL-TIME POLLING — checks /api/tickets every 5 seconds and updates the table live
+        function pollTickets() {
+            fetch('/api/tickets')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) return;
+
+                document.querySelectorAll('tr[id^="ticket-row-"]').forEach(row => {
+                    const ticketId = parseInt(row.id.replace('ticket-row-', ''));
+                    const freshTicket = data.tickets.find(t => t.id === ticketId);
+
+                    if (!freshTicket) {
+                        row.remove();
+                    } else {
+                        const statusCell = document.getElementById(`status-text-${ticketId}`);
+                        if (statusCell && statusCell.innerText.trim() !== freshTicket.status) {
+                            statusCell.innerText = freshTicket.status;
+                            statusCell.style.backgroundColor = '#ffffcc';
+                            setTimeout(() => statusCell.style.backgroundColor = 'transparent', 2000);
+                        }
+                    }
+                });
+            })
+            .catch(err => console.error("Polling error:", err));
+        }
+        // Start polling every 5 seconds
+        if (!is_history){
+            setInterval(pollTickets, 5000);
+        }
+    </script>
+</body>
+
+</html>

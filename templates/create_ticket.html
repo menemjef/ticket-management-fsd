@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='ticket.png') }}"
+>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ticket</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='indexstyles.css')}}">
+    <h1 style="text-align: center;">Create Ticket, {{ username }}!</h1>
+    <hr>
+    <a href="/" style="text-align: center; display: block;">Home</a>
+</head>
+<body>
+    <div class="bg-fixed"></div>
+    <div class="ui-cluster center">
+    <h2 style="color: rgb(29, 48, 85); text-align: center;">Actions:</h2>
+    <form action="/create-ticket" method="post" enctype="multipart/form-data" style="text-align: center;">
+    <br>
+    <table style="margin:auto; border-collapse: collapse;">
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><input type="text" name="title"></td>
+            <td><input type="text" name="description"></td>
+            <td>
+                <label class="file-btn">
+                    <span>Select file</span>
+                    <input type="file" name="attachment" id="attachment-input" />
+                </label>
+                <span id="file-name" style="margin-left:10px; font-size:0.9rem; color: #333;"></span>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <input type="submit" value="Create Ticket">
+    <h3 style="text-align: center;">{{ttext}}</h3>
+</form>
+    <script>
+        const input = document.getElementById('attachment-input');
+        const nameSpan = document.getElementById('file-name');
+        if (input) {
+            input.addEventListener('change', (e) => {
+                const f = e.target.files[0];
+                nameSpan.textContent = f ? f.name : '';
+            });
+        }
+    </script>
+    </div>
+</body>
+</html>
