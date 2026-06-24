@@ -105,32 +105,14 @@ def home():
 
 @main_bp.route('/login')
 def login_page():
-    firebase_config = {
-        "apiKey": os.environ.get("FIREBASE_API_KEY", ""),
-        "authDomain": os.environ.get("FIREBASE_AUTH_DOMAIN", ""),
-        "projectId": os.environ.get("FIREBASE_PROJECT_ID", ""),
-        "storageBucket": os.environ.get("FIREBASE_STORAGE_BUCKET", ""),
-        "messagingSenderId": os.environ.get("FIREBASE_MESSAGING_SENDER_ID", ""),
-        "appId": os.environ.get("FIREBASE_APP_ID", ""),
-        "measurementId": os.environ.get("FIREBASE_MEASUREMENT_ID", "")
-    }
     # Only add the popup opener header where it's actually required to support the Firebase iframe!
-    response = make_response(render_template('login.html', firebase_config=firebase_config))
+    response = make_response(render_template('login.html'))
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
     return response
 
 @main_bp.route('/register')
 def register_page():
-    firebase_config = {
-        "apiKey": os.environ.get("FIREBASE_API_KEY", ""),
-        "authDomain": os.environ.get("FIREBASE_AUTH_DOMAIN", ""),
-        "projectId": os.environ.get("FIREBASE_PROJECT_ID", ""),
-        "storageBucket": os.environ.get("FIREBASE_STORAGE_BUCKET", ""),
-        "messagingSenderId": os.environ.get("FIREBASE_MESSAGING_SENDER_ID", ""),
-        "appId": os.environ.get("FIREBASE_APP_ID", ""),
-        "measurementId": os.environ.get("FIREBASE_MEASUREMENT_ID", "")
-    }
-    response = make_response(render_template('register.html', firebase_config=firebase_config))
+    response = make_response(render_template('register.html'))
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
     return response
     
