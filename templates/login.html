@@ -47,15 +47,16 @@
         import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 
+        // Initialize Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyB2F_s0thIVRgPEoSrbq-C3Rj1MVPQrYks",
-            authDomain: "ticket-management-system-1233e.firebaseapp.com",
-            projectId: "ticket-management-system-1233e",
-            storageBucket: "ticket-management-system-1233e.firebasestorage.app",
-            messagingSenderId: "934840929111",
-            appId: "1:934840929111:web:0659e0babd61764f8fcc12"
+            apiKey: "{{ firebase_config.apiKey }}",
+            authDomain: "{{ firebase_config.authDomain }}",
+            projectId: "{{ firebase_config.projectId }}",
+            storageBucket: "{{ firebase_config.storageBucket }}",
+            messagingSenderId: "{{ firebase_config.messagingSenderId }}",
+            appId: "{{ firebase_config.appId }}",
+            measurementId: "{{ firebase_config.measurementId }}"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
