@@ -9,9 +9,9 @@ try:
     # Initialize Firebase before loading routes
     firebase_cred_json = os.environ.get("FIREBASE_CREDENTIALS")
     if firebase_cred_json:
-        # Vercel sometimes escapes newlines in env vars, which breaks the private key
-        firebase_cred_json = firebase_cred_json.replace('\\n', '\n')
-        cred_dict = json.loads(firebase_cred_json)
+        # Vercel preserves the JSON exactly, so we just parse it directly.
+        # strict=False allows literal control characters just in case Vercel stripped the escapes
+        cred_dict = json.loads(firebase_cred_json, strict=False)
         cred = credentials.Certificate(cred_dict)
     else:
         cred = credentials.Certificate("firebase.json")
