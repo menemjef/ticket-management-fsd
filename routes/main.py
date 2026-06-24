@@ -15,7 +15,7 @@ main_bp = Blueprint('main', __name__)
 def download(ticket_id):
 
     conn = mysql.connector.connect(**db)
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute(
         """
@@ -86,7 +86,7 @@ def download(ticket_id):
     # If DB didn't already contain the absolute path, persist the discovered location for future fast access
     try:
         db_conn = mysql.connector.connect(**db)
-        db_cursor = db_conn.cursor()
+        db_cursor = db_conn.cursor(buffered=True)
         basename = os.path.basename(found_path)
         db_cursor.execute("UPDATE tickets SET attachment_path = %s, attachment_name = %s WHERE id = %s", (found_path, basename, ticket_id))
         db_conn.commit()
@@ -138,7 +138,7 @@ def verify_token():
 
         # 2. Database verification check
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
         
         # Check by UID first
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
@@ -202,7 +202,7 @@ def register_user():
         email = decoded.get("email", "no-email@example.com")
 
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor()
+        cursor = conn.cursor(buffered=True)
 
         cursor.execute(
             "INSERT INTO users (firebase_uid, username, email, role) VALUES (%s, %s, %s, %s)", 
@@ -232,7 +232,7 @@ def dashboard_page():
         uid = decoded["uid"]
 
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
 
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()
@@ -283,7 +283,7 @@ def create_ticket():
             upload_path = filepath
 
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
 
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()
@@ -364,7 +364,7 @@ def create_ticket_page():
         uid = decoded["uid"]
 
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()    
         cursor.close()
@@ -392,7 +392,7 @@ def view_tickets():
         uid = decoded["uid"]
         
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()
 
@@ -428,7 +428,7 @@ def api_tickets():
         uid = decoded["uid"]
 
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()
 
@@ -462,7 +462,7 @@ def update_ticket(ticket_id):
         uid = decoded["uid"]
 
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()
 
@@ -550,7 +550,7 @@ def delete_ticket(ticket_id):
         uid = decoded["uid"]
 
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()
 
@@ -626,7 +626,7 @@ def view_ticket_history():
         uid = decoded["uid"]
         
         conn = mysql.connector.connect(**db)
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
         cursor.execute("SELECT * FROM users WHERE firebase_uid = %s", (uid,))
         user = cursor.fetchone()
 
