@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import mysql.connector
 from utils import db
 
@@ -49,28 +50,8 @@ def init_database():
         """)
         print("- TicketHistory table ensured.")
 
-        # 4. Create Triggers safely (Drop first to avoid 'already exists' errors if schema changes)
-        cursor.execute("DROP TRIGGER IF EXISTS after_ticket_insert")
-        cursor.execute("""
-        CREATE TRIGGER after_ticket_insert
-        AFTER INSERT ON tickets
-        FOR EACH ROW
-        BEGIN
-            INSERT IGNORE INTO tickethistory (id, title, description, status, user_id)
-            VALUES (NEW.id, NEW.title, NEW.description, NEW.status, NEW.user_id);
-        END
-        """)
-
-        cursor.execute("DROP TRIGGER IF EXISTS after_ticket_update")
-        cursor.execute("""
-        CREATE TRIGGER after_ticket_update
-        AFTER UPDATE ON tickets
-        FOR EACH ROW
-        BEGIN
-            UPDATE tickethistory SET status = NEW.status WHERE id = NEW.id;
-        END
-        """)
-        print("- Triggers ensured.")
+        # 4. Skip triggers (TiDB doesn't support them, handled via Python app logic now)
+        print("- Skipped triggers (Handled by application logic for TiDB compatibility).")
 
         # 5. Data Seeding
         # Seed an admin user if it doesn't exist
