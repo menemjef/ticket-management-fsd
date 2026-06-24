@@ -311,7 +311,10 @@ def create_ticket():
         )   
 
         for admin in admins:
-            sendEmail(admin["email"], "New Ticket", body)
+            try:
+                sendEmail(admin["email"], "New Ticket", body)
+            except Exception as email_err:
+                print(f"Warning: Failed to send new ticket email to {admin['email']}: {email_err}")
 
         # Using INSERT IGNORE to prevent conflicts with the after_ticket_insert MySQL trigger
         cursor.execute(
@@ -507,7 +510,10 @@ def update_ticket(ticket_id):
             else:
                 body = "Your ticket #%s status is now %s." % (ticket_id, status)
             
-            sendEmail(user_email, "Ticket Updated", body)
+            try:
+                sendEmail(user_email, "Ticket Updated", body)
+            except Exception as email_err:
+                print(f"Warning: Failed to send ticket update email to {user_email}: {email_err}")
 
             conn.commit()
             cursor.close()
