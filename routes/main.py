@@ -616,6 +616,16 @@ def delete_ticket(ticket_id):
         print(e)
         return jsonify({"success": False, "error": str(e)}), 500
 
+@main_bp.route("/test-email")
+def test_email():
+    try:
+        from utils import sendEmail
+        sendEmail("arjunkarthik1223@gmail.com", "Vercel Email Test", "This is a test from Vercel.")
+        return "SUCCESS! Email sent.", 200
+    except Exception as e:
+        import traceback
+        return f"FAILED!<br>Error: {str(e)}<br><pre>{traceback.format_exc()}</pre>", 500
+
 @main_bp.route("/view-ticket-history", methods=["POST", "GET"])
 def view_ticket_history():
     is_history=True
