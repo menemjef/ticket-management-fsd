@@ -310,18 +310,18 @@ def create_ticket():
             user["id"]
         )   
 
-        for admin in admins:
-            try:
-                sendEmail(admin["email"], "New Ticket", body)
-            except Exception as email_err:
-                print(f"Warning: Failed to send new ticket email to {admin['email']}: {email_err}")
-
         # Using INSERT IGNORE to prevent conflicts with the after_ticket_insert MySQL trigger
         cursor.execute(
             "INSERT IGNORE INTO tickethistory (id, title, description, status, user_id) VALUES (%s, %s, %s, %s, %s)", 
             (ticket_id, title, description, "Open", user["id"])
         )
         conn.commit()
+
+        for admin in admins:
+            try:
+                sendEmail(admin["email"], "New Ticket", body)
+            except Exception as email_err:
+                print(f"Warning: Failed to send new ticket email to {admin['email']}: {email_err}")
         
         cursor.execute("SELECT * FROM tickethistory WHERE user_id = %s", (user["id"],))
         tickets = cursor.fetchall()
@@ -510,12 +510,14 @@ def update_ticket(ticket_id):
             else:
                 body = "Your ticket #%s status is now %s." % (ticket_id, status)
             
+            # Commit the status update to DB FIRST before sending email
+            conn.commit()
+            
             try:
                 sendEmail(user_email, "Ticket Updated", body)
             except Exception as email_err:
                 print(f"Warning: Failed to send ticket update email to {user_email}: {email_err}")
 
-            conn.commit()
             cursor.close()
             conn.close()
 
