@@ -7,16 +7,8 @@ EMAIL = os.environ.get("APP_EMAIL", "ticketmanagementinternship6742@gmail.com")
 APP_PASSWORD = os.environ.get("APP_PASSWORD", "fibx vaeu ivbb fjhx")
 
 def sendEmail(recipient, subject, body):
-    msg = MIMEMultipart()
-    msg["Subject"] = subject
-    msg["From"] = EMAIL
-    msg["To"] = recipient
-    msg.attach(MIMEText(body, "plain"))
-
-    # Use SSL on port 465 (less blocked by cloud hosting providers than STARTTLS/587)
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
-        server.login(EMAIL, APP_PASSWORD)
-        server.send_message(msg)
+    # EMAIL TEMPORARILY DISABLED - Render free tier blocks outbound SMTP
+    print(f"[EMAIL SKIPPED] To: {recipient} | Subject: {subject}")
 
 # db = {
 #     "host": os.environ.get("DB_HOST", "localhost"),
