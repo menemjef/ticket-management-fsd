@@ -35,6 +35,9 @@ if _db_host != "localhost" and _db_host != "127.0.0.1":
     db["ssl_verify_cert"] = False
 
 
-# Absolute uploads directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
+# Absolute uploads directory (Use /tmp on Vercel because Vercel filesystem is read-only)
+if os.environ.get("VERCEL"):
+    UPLOADS_DIR = "/tmp/uploads"
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
