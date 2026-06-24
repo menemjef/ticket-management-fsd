@@ -31,7 +31,7 @@ if startup_error:
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def catch_all(path):
-        return f"<h1>App Crashed on Startup</h1><p><b>Error:</b> {startup_error}</p>", 500
+        return f"<h1>App Crashed on Startup</h1><p><b>Error:</b> {startup_error}</p>", 200
 else:
     # Register the blueprint only if no errors
     app.register_blueprint(main_bp)
